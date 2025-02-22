@@ -1,0 +1,917 @@
+---
+title: "Emotion Recognition"
+author: "Noham Wolpe"
+date: "2024-08-25"
+output: html_document
+---
+<!-- ## Plots -->
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r load packages, echo=TRUE}
+
+rm(list = ls())
+
+## load required packages
+library(readxl)
+library(lme4)
+library(tidyverse)
+library(tidyr)
+
+```
+
+```{r FigureS1 model free accuracy, fig.show="asis", echo=FALSE}
+
+## now plot figure 1
+data_fig1 <- read.csv('~/Documents/Emotion_studies/EkmanTask/Figures/fig1.csv')
+
+# Select the variables for PCA
+pca_vars <- data_fig1[, c("accuracy_1", "accuracy_3", "accuracy_4", "accuracy_6")]
+
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+
+colour_young <- '#EB9059'
+colour_old <- '#4C9FDE'
+
+# Create a data frame with the LOESS smoothed values
+loess_fit <- loess(accuracy_1 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1a <- ggplot(data_fig1, aes(x = age, y = accuracy_1)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for fear",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for surprise
+
+loess_fit <- loess(accuracy_2 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1b <- ggplot(data_fig1, aes(x = age, y = accuracy_2)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for surprise",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+#  now for sadness
+loess_fit <- loess(accuracy_3 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1c <- ggplot(data_fig1, aes(x = age, y = accuracy_3)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for sadness",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for happiness
+loess_fit <- loess(accuracy_4 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1d <- ggplot(data_fig1, aes(x = age, y = accuracy_4)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for happiness",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now disgust
+loess_fit <- loess(accuracy_5 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1e <- ggplot(data_fig1, aes(x = age, y = accuracy_5)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for disgust",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for anger
+loess_fit <- loess(accuracy_6 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+fig1f <- ggplot(data_fig1, aes(x = age, y = accuracy_6)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Mean accuracy for anger",
+    color = "Age"
+  ) +
+  ylim(c(0,1))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+
+fig1<-plot_grid(fig1a, fig1b, fig1c, fig1d, fig1e, fig1f,
+                ncol  = 3,
+                align = 'hv',
+                axis  = 'tb',
+                labels = c("A", "B", "C", "D", "E", "F")
+)
+
+fig1
+print(fig1)
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Figures/Fig1.png",
+       plot = fig1, dpi = 300, width = 10, height = 8)
+
+
+```
+
+
+```{r FigureS2 model free RT, fig.show="asis", echo=FALSE}
+
+## now plot figure 1
+data_fig1 <- read.csv('~/Documents/Emotion_studies/EkmanTask/Figures/fig1.csv')
+
+
+cor.test(data_fig$rt_1, data_fig1$age, method="spearman")
+cor.test(data_fig$rt_2, data_fig1$age, method="spearman")
+cor.test(data_fig$rt_3, data_fig1$age, method="spearman")
+cor.test(data_fig$rt_4, data_fig1$age, method="spearman")
+cor.test(data_fig$rt_5, data_fig1$age, method="spearman")
+cor.test(data_fig$rt_6, data_fig1$age, method="spearman")
+
+
+library(ggplot2)
+library(dplyr)
+library(cowplot)
+
+colour_young <- '#EB9059'
+colour_old <- '#4C9FDE'
+
+# Create a data frame with the LOESS smoothed values
+loess_fit <- loess(rt_1 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1a <- ggplot(data_fig1, aes(x = age, y = rt_1)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for fear (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+print(figS1a)
+# now for surprise
+
+loess_fit <- loess(rt_2 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1b <- ggplot(data_fig1, aes(x = age, y = rt_2)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for surprise (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+#  now for sadness
+loess_fit <- loess(rt_3 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1c <- ggplot(data_fig1, aes(x = age, y = rt_3)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for sadness (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for happiness
+loess_fit <- loess(rt_4 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1d <- ggplot(data_fig1, aes(x = age, y = rt_4)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for happiness (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now disgust
+loess_fit <- loess(rt_5 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1e <- ggplot(data_fig1, aes(x = age, y = rt_5)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for disgust (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for anger
+loess_fit <- loess(rt_6 ~ age, data = data_fig1)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS1f <- ggplot(data_fig1, aes(x = age, y = rt_6)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Median reaction time for anger (s)",
+    color = "Age"
+  ) +
+  ylim(c(0,6))+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+
+figS1<-plot_grid(figS1a, figS1b, figS1c, figS1d, figS1e, figS1f,
+                ncol  = 3,
+                align = 'hv',
+                axis  = 'tb',
+                labels = c("A", "B", "C", "D", "E", "F")
+)
+
+
+figS1
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Figures/FigS1.png",
+       plot = figS1, dpi = 300, width = 10, height = 8)
+
+
+```
+
+```{r model free correlations of accuracy and age, fig.show="asis", echo=FALSE}
+
+data_fig <- read.csv('~/Documents/Emotion_studies/EkmanTask/data_emotion_recognition.csv')
+
+library(tidyr)
+library(dplyr)
+library(lmerTest)
+library(psych)
+
+
+cor.test(data_fig$accuracy_1, data_fig$age, method="spearman")
+cor.test(data_fig$accuracy_2, data_fig$age, method="spearman")
+cor.test(data_fig$accuracy_3, data_fig$age, method="spearman")
+cor.test(data_fig$accuracy_4, data_fig$age, method="spearman")
+cor.test(data_fig$accuracy_4, data_fig$age, method="pearson")
+cor.test(data_fig$accuracy_5, data_fig$age, method="spearman")
+cor.test(data_fig$accuracy_6, data_fig$age, method="spearman")
+
+# Convert to long format for accuracy
+long_data_accuracy <- data_fig %>%
+  pivot_longer(cols = starts_with("accuracy_"),
+               names_to = "condition",
+               values_to = "accuracy")
+
+# Fit the mixed-effects model
+model <- lmer(accuracy ~ condition + age + condition*age + sex + education + Benton + handedness + (1 | ccid), data = long_data_accuracy)
+
+# Summary of the model
+# summary(model)
+
+# ANOVA table
+anova(model)
+
+
+```
+
+
+
+```{r Figure2 Psychometric BIC and goodness-of-fit, fig.show="asis", echo=FALSE}
+require(cowplot)
+# Define the file paths for your images
+fig2a_path <- "~/Documents/Emotion_studies/EkmanTask/Fig2A.jpg"
+fig2b_path <- "~/Documents/Emotion_studies/EkmanTask/Fig2B.jpg"
+
+# Create image plots
+fig2a <- ggdraw() + 
+  draw_image(fig2a_path, scale = 1) +
+  theme(plot.margin = margin(0, 0, 0, 0))
+
+fig2b <- ggdraw() + 
+  draw_image(fig2b_path, scale = 1) +
+  theme(plot.margin = margin(0, 0, 0, 0))
+
+# Combine the plots into a single figure with reduced spacing
+fig2 <- plot_grid(
+  fig2a, fig2b,
+  ncol = 2,
+  align = 'hv',
+  axis = 'tb',
+  labels = c("A", "B"),
+  label_y = 0.9,   # Move the label positions up to reduce space between plots and labels
+  rel_widths = c(1, 1),  # Adjust to control relative widths
+  scale = c(1, 1)    # Adjust scale to reduce white space
+)
+
+# Display the combined plot
+print(fig2)
+
+# Save the combined plot as a JPG file
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Fig2_fit.jpg", 
+       plot = fig2b, 
+       width = 10,  # Adjust width as needed
+       height = 5,  # Adjust height as needed
+       dpi = 300)   # Set the resolution to 300 dpi for high quality
+
+```
+
+
+
+
+```{r Figure3 threshold with age for different emotions, fig.show="asis", echo=TRUE}
+
+
+data_fig <- read.csv('~/Documents/Emotion_studies/EkmanTask/data_emotion_recognition1.csv')
+
+colour_young <- '#EB9059'
+colour_old <- '#4C9FDE'
+
+loess_fit <- loess(threshold_1 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2a <- ggplot(data_fig, aes(x = age, y = threshold_1)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Fear recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+#  now for sadness
+loess_fit <- loess(threshold_2 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2b <- ggplot(data_fig, aes(x = age, y = threshold_2)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Surprise recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+loess_fit <- loess(threshold_3 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2c <- ggplot(data_fig, aes(x = age, y = threshold_3)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Sad recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+loess_fit <- loess(threshold_4 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2d <- ggplot(data_fig, aes(x = age, y = threshold_4)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Happy recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for happiness
+loess_fit <- loess(threshold_5 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2e <- ggplot(data_fig, aes(x = age, y = threshold_5)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Disgust recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+# now for happiness
+loess_fit <- loess(threshold_6 ~ age, data = data_fig)
+smoothed_data <- data.frame(age = loess_fit$x, smoothed = loess_fit$fitted)
+
+figS2f <- ggplot(data_fig, aes(x = age, y = threshold_6)) +
+  geom_point(aes(color = age), alpha = 1) +
+  geom_line(data = smoothed_data, aes(x = age, y = smoothed, color = age), size = 2) +
+  scale_color_gradient(low = colour_young, high = colour_old) +
+  theme_minimal() +
+  labs(
+    x = "Age (years)",
+    y = "Anger recognition threshold",
+    color = "Age"
+  ) +
+  ylim(25, 175)+
+  theme(
+    legend.position = "none", # Remove legend if not needed
+    panel.grid.major = element_line(color = "grey90")
+  )
+
+figS2<-plot_grid(figS2a, figS2b, figS2c, figS2d, figS2e, figS2f,
+                ncol  = 3,
+                align = 'hv',
+                axis  = 'tb',
+                labels = c("A", "B", "C", "D", "E", "F")
+)
+
+
+figS2
+
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Figures/Fig3.jpg",
+       plot = figS2, dpi = 300, width = 10, height = 8)
+
+
+```
+
+
+```{r correlation between age on thresholds psychometric model fit, fig.show="asis", echo=FALSE}
+
+data_fig <- read.csv('~/Documents/Emotion_studies/EkmanTask/data_emotion_recognition1.csv')
+
+data2analyse <- data.frame(fear = data_fig$threshold_1,
+                           surprise = data_fig$threshold_2,
+                           sadness = data_fig$threshold_3,
+                           happiness = data_fig$threshold_4,
+                           disgust = data_fig$threshold_5,
+                           anger = data_fig$threshold_6,
+                           age = data_fig$age,
+                           sex_factor = as.factor(data_fig$sex),
+                           sex_number = ifelse(data_fig$sex == "M", 1, 0),
+                           Benton = data_fig$Benton,
+                           education = factor(data_fig$education, levels = c(0,1,2,3,4))
+)
+
+
+library(boot)
+library(ppcor)
+
+# Define bootstrap function
+boot_partial_spearman <- function(data, indices, emotion_type) {
+  sample_data <- data[indices, ]  # Resample with replacement
+  
+  # Try computing partial correlation, return NA if it fails
+  result <- tryCatch({
+    pcor.test(sample_data$age, sample_data[[emotion_type]], 
+              cbind(sample_data$sex_number, sample_data$Benton), 
+              method = "spearman")$estimate
+  }, error = function(e) NA)
+  
+  return(result)  # Returns correlation or NA if error
+}
+
+clean_data <- na.omit(data2analyse)
+p1 <- ppcor::pcor.test(clean_data$age, clean_data$fear, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+p2 <- ppcor::pcor.test(clean_data$age, clean_data$surprise, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+p3 <- ppcor::pcor.test(clean_data$age, clean_data$sadness, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+p4 <- ppcor::pcor.test(clean_data$age, clean_data$happiness, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+p5 <- ppcor::pcor.test(clean_data$age, clean_data$disgust, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+p6 <- ppcor::pcor.test(clean_data$age, clean_data$anger, cbind(clean_data$sex_number, clean_data$Benton), method = "spearman")$p.value
+
+p_values <- c(p1, p2, p3, p4, p5, p6)
+p_adjusted <- p.adjust(p_values, method = "bonferroni")
+
+
+```
+
+
+
+```{r PCA and loading, fig.show="asis", echo=FALSE}
+
+library(dplyr)
+library(tidyr)
+library(cowplot) 
+
+
+data_scaled <- data2analyse  # Create a copy of the original data frame
+colnames(data_scaled) <- c("fear", "surprise", "sad", "happy", "disgust", "anger", "age", "sex", "Benton")
+numeric_columns <- sapply(data_scaled, is.numeric)  # Identify numeric columns
+data_scaled[, numeric_columns] <- scale(data_scaled[, numeric_columns])
+
+
+pca_result_four_emotions <- prcomp(data_scaled[, c("happy", "sad", "anger", "fear")], scale. = TRUE)
+summary(pca_result_four_emotions)
+
+# Compute robust mean and SD
+robust_mean <- colMeans(data_scaled[, c("happy", "sad", "anger", "fear")])
+robust_sd <- apply(data_scaled[, c("happy", "sad", "anger", "fear")], 2, mad)
+
+# Define threshold (3 times robust SD)
+outlier_mask <- apply(data_scaled[, c("happy", "sad", "anger", "fear")], 1, function(row) {
+  any(abs(row - robust_mean) > (3 * robust_sd))
+})
+
+# Filter out extreme values
+data_filtered <- data_scaled[!outlier_mask, ]
+
+# Run PCA on filtered data (without extreme values)
+pca_trimmed <- prcomp(data_filtered[, c("happy", "sad", "anger", "fear")], scale. = TRUE)
+# Extract PC1 scores from trimmed dataset
+pc1_trimmed <- pca_trimmed$x[, 1]
+
+cor(pca_result_four_emotions$x[,1][!outlier_mask], pc1_trimmed)
+
+pca_result_all <- prcomp(data_scaled[, c("happy", "sad", "anger", "fear", 'surprise', 'disgust')], scale. = TRUE)
+summary(pca_result_all)
+cor.test(pca_result_all$x[,1], pca_result_four_emotions$x[,1])
+
+eigenvalues <- pca_result_all$sdev^2
+
+# Extract the loading for the first two components
+loadings <- -data.frame(pca_result$rotation[, 1:4])  # For PC1-PC4
+loadings$emotion <- rownames(loadings)  # Add emotion names as a column
+loadings <- loadings %>% pivot_longer(cols = -emotion, names_to = "Component", values_to = "Loading")
+
+# Calculate cumulative variance explained
+variance_explained <- eigenvalues / sum(eigenvalues)
+cumulative_variance <- cumsum(variance_explained)
+pc_labels <- paste0("PC", 1:length(eigenvalues))
+
+# Create data frame for cumulative variance plot
+cumulative_variance_df <- data.frame(
+  Component = pc_labels,
+  Variance_Explained = cumulative_variance
+)
+
+```
+
+```{r Table2 GLM results, fig.show="asis", echo=FALSE}
+
+# Load necessary libraries
+library(broom)
+library(flextable)
+library(officer)
+
+glm_table <- read.csv('~/Documents/Emotion_studies/EkmanTask/glm_table.csv')
+
+glm_table$acer_total[glm_table$acer_total==0] <- mean(glm_table$acer_total)
+
+glm_table_zscore = data.frame(Benton = scale(glm_table$Benton),
+                              factor1 = scale(glm_table$factor1),
+                              age=scale(glm_table$age),
+                              handedness = scale(glm_table$handedness),
+                              sex = as.factor(glm_table$sex),
+                              cattell = scale(glm_table$cattell),
+                              acer=scale(glm_table$acer_total),
+                              depression = scale(glm_table$depression))
+
+# female coded as 1, male as 0
+glm_model1<- lm('factor1 ~ Benton + age*cattell + sex + handedness', data = glm_table_zscore)
+summary(glm_model1)
+
+glm_model2<- lm('factor1 ~ Benton + age*depression + sex + handedness', data = glm_table_zscore)
+summary(glm_model2)
+
+glm_model3<- lm('factor1 ~ Benton + age*acer + sex + handedness', data = glm_table_zscore)
+summary(glm_model3)
+
+# now save as Table
+tidy_model1 <- broom::tidy(glm_model1) %>%
+  mutate(across(c(estimate, std.error, statistic), ~ round(., 3))) # Round to 2 decimal places
+
+tidy_model2 <- broom::tidy(glm_model2) %>%
+  mutate(across(c(estimate, std.error, statistic), ~ round(., 3))) # Round to 2 
+
+tidy_model3 <- broom::tidy(glm_model3) %>%
+  mutate(across(c(estimate, std.error, statistic), ~ round(., 3))) # Round to 2 
+
+# Create a flextable from the tidy output
+glm_flextable1 <- flextable(tidy_model1) %>%
+  set_header_labels(term = "Predictor", estimate = "Estimate", std.error = "SE",
+                    statistic = "t-statistic", p.value = "p-value") %>%
+  theme_vanilla() %>% # Optional: apply a simple theme
+  autofit() # Adjust column widths
+
+glm_flextable2 <- flextable(tidy_model2) %>%
+  set_header_labels(term = "Predictor", estimate = "Estimate", std.error = "SE",
+                    statistic = "t-statistic", p.value = "p-value") %>%
+  theme_vanilla() %>% # Optional: apply a simple theme
+  autofit() # Adjust column widths
+
+glm_flextable3 <- flextable(tidy_model3) %>%
+  set_header_labels(term = "Predictor", estimate = "Estimate", std.error = "SE",
+                    statistic = "t-statistic", p.value = "p-value") %>%
+  theme_vanilla() %>% # Optional: apply a simple theme
+  autofit() # Adjust column widths
+
+# Export to Word
+doc1 <- read_docx() %>% # Create a new Word document
+  # body_add_par("GLM Results", style = "heading 1") %>%
+  body_add_flextable(glm_flextable1) %>%
+  body_add_par("") # Add a line break
+
+doc2 <- read_docx() %>% # Create a new Word document
+  # body_add_par("GLM Results", style = "heading 1") %>%
+  body_add_flextable(glm_flextable2) %>%
+  body_add_par("") # Add a line break
+
+doc3 <- read_docx() %>% # Create a new Word document
+  # body_add_par("GLM Results", style = "heading 1") %>%
+  body_add_flextable(glm_flextable3) %>%
+  body_add_par("") # Add a line break
+
+print(doc1, target = "~/Documents/Emotion_studies/EkmanTask/GLM_results1.docx")
+print(doc2, target = "~/Documents/Emotion_studies/EkmanTask/GLM_results2.docx")
+print(doc3, target = "~/Documents/Emotion_studies/EkmanTask/GLM_results3.docx")
+
+```
+
+
+
+```{r Figure4 correlation matrix and illustration of interaction, fig.show="asis", echo=FALSE}
+
+library(reshape2)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+
+glm_table <- read.csv('~/Documents/Emotion_studies/EkmanTask/glm_table.csv')
+glm_table$acer_total[glm_table$acer_total==0] <- mean(glm_table$acer_total)
+# Calculate the correlation matrix
+new_colnames <- colnames(glm_table)
+new_colnames[10] <- "Cattell"
+new_colnames[22] <-"ACER"
+new_colnames[24] <- "PC1"
+
+colnames(glm_table)<- new_colnames
+
+numeric_vars <- glm_table[, c("Benton", "age", "Cattell", "depression", "handedness", "PC1")]
+
+cor_matrix <- cor(numeric_vars, use = "complete.obs", method = "pearson")
+
+# Reshape the correlation matrix into long format for ggplot
+cor_data <- melt(cor_matrix) %>%
+  mutate(value_label = ifelse(Var1 == Var2, NA, round(value, 2))) # Remove diagonal labels
+
+
+# Plot the correlation matrix with R values
+
+variable_labels <- c(
+  "Benton" = "Face Recognition",
+  "age" = "Age",
+  "Cattell" = "Cattell Fluid Intelligence",
+  "depression" = "HADS (Depression)",
+  "handedness" = "Handedness",
+  "PC1" = "Positivity Bias (PC1)"
+)
+
+fig6A <- ggplot(cor_data, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") + # Create tiles
+  geom_text(aes(label = value_label), color = "black", size = 4, na.rm = TRUE) + # Add R values without diagonal
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, 
+                       limits = c(-1, 1), name = "Correlation") +
+  scale_x_discrete(labels = variable_labels) + 
+  scale_y_discrete(labels = variable_labels) + 
+  labs(x = "", y = "") +
+  theme_minimal(base_size = 15) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 12)
+  )
+
+
+# Display the plot
+print(fig6A)
+
+# Define the colors for the gradient
+colour_young <- '#EB9059'
+colour_middle <- '#b29aa1'
+colour_old <- '#4C9FDE'
+
+# Create the age group variable
+glm_table <- glm_table %>%
+  mutate(age_group = factor(case_when(
+    age <= 40 ~ "Young",
+    age > 40 & age <= 60 ~ "Middle",
+    age > 60 ~ "Older"
+  ), levels = c("Young", "Middle", "Older")))  # Specify the order of levels
+
+
+# Plot with separate colors and add a manual legend
+fig6B <- ggplot(glm_table, aes(x = Cattell, y = PC1, color = age_group)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(data = glm_table %>% filter(age_group == "Young"), method = "lm", se = TRUE, color = colour_young) +
+  geom_smooth(data = glm_table %>% filter(age_group == "Middle"), method = "lm", se = TRUE, color = colour_middle) +
+  geom_smooth(data = glm_table %>% filter(age_group == "Older"), method = "lm", se = TRUE, color = colour_old) +
+  scale_color_manual(values = c("Young" = colour_young, "Middle" = colour_middle, "Older" = colour_old)) +
+  labs(x = "Cattell score", y = "Positivity bias (PC1)", color = "Age") +
+  theme_minimal(base_size = 15) +
+  theme(
+    legend.position = "top",
+    # axis.title = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+# Display the plot
+print(fig6B)
+
+figure6 <- plot_grid(fig6A, fig6B, labels = c("A", "B"), ncol = 2)
+
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Figures/Fig6.jpg",
+       plot = figure6, dpi = 300, width = 12, height = 6)
+
+```
+
+
+
+
+```{r Figure5B interaction plot, fig.show="asis", echo=FALSE}
+
+# fig7_data <- read.csv('~/Documents/Emotion_studies/EkmanTask/Figures/data4figure.csv', header = TRUE)
+
+library(stats)
+# fig7_data <- read.csv('~/Documents/data4figure.csv', header = TRUE)
+fig7_data <- read.csv('~/Documents/data4figure_average.csv', header = TRUE)
+# Load necessary library
+
+# Fit a linear model to predict GM volume from all covariates EXCEPT age & PC1
+covariate_model <- lm(GM ~ sex + Benton + motion, data = fig7_data)
+
+# Get the residuals (adjusted GM volume)
+fig7_data$adjusted_y <- residuals(covariate_model) + coef(covariate_model)[1]  # Keep intercept
+
+ind2remove <- which(fig7_data$GM>1)
+fig7_data$GM[ind2remove] <- NA
+fig7_data$adjusted_y[ind2remove] <- NA
+
+# colnames(fig7_data) <- c("age", "PC1", "GM_volume")
+
+# Define the colors for the gradient
+colour_young <- '#EB9059'
+colour_middle <- '#b29aa1'
+colour_old <- '#4C9FDE'
+
+# Create the age group variable
+fig7_data <- fig7_data %>%
+  mutate(age_group = factor(case_when(
+    age <= 40 ~ "Young",
+    age > 40 & age <= 60 ~ "Middle",
+    age > 60 ~ "Older"
+  ), levels = c("Young", "Middle", "Older")))  # Specify the order of levels
+
+
+# Plot with separate colors and add a manual legend
+fig7B <- ggplot(fig7_data, aes(x = PC1, y = GM, color = age_group)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(data = fig7_data %>% filter(age_group == "Young"), method = "lm", se = TRUE, color = colour_young) +
+  geom_smooth(data = fig7_data %>% filter(age_group == "Middle"), method = "lm", se = TRUE, color = colour_middle) +
+  geom_smooth(data = fig7_data %>% filter(age_group == "Older"), method = "lm", se = TRUE, color = colour_old) +
+  scale_color_manual(values = c("Young" = colour_young, "Middle" = colour_middle, "Older" = colour_old)) +
+  labs(x = "Positivity bias (PC1)", y = "GM volume", color = "Age") +
+  theme_minimal(base_size = 15) +
+  # ylim(0.4, 1.1)+
+    theme_dark(base_size = 15) + # Apply a dark theme
+  theme(
+    legend.position = "top",
+    panel.background = element_rect(fill = "black", color = NA), # Black background
+    plot.background = element_rect(fill = "black", color = NA),  # Black plot background
+    panel.grid.major = element_line(color = "grey50"), # Adjust grid line color for visibility
+    panel.grid.minor = element_line(color = "grey30"), # Adjust minor grid line color
+    axis.text = element_text(color = "white"), # White axis text
+    axis.title = element_text(color = "white"), # White axis titles
+    plot.title = element_text(color = "white", hjust = 0.5),
+    legend.text = element_text(color = "white"), # White legend text
+    legend.title = element_text(color = "white"),
+        legend.background = element_rect(fill = "black", color = NA), # Black legend background
+    legend.key = element_rect(fill = "black", color = NA), # Black background for legend keys
+
+  )
+
+
+# Display the plot
+print(fig7B)
+
+ggsave(filename = "~/Documents/Emotion_studies/EkmanTask/Figures/Fig7B_R1.jpg",
+       plot = fig7B, dpi = 300, width = 4, height = 4)
+
+
+```
